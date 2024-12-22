@@ -6,30 +6,24 @@ import FoodSearchViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,16 +31,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavType
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.dvc.vitamind.screens.UserDetailScreen
+import com.dvc.vitamind.screens.UserInputScreen
 import com.dvc.vitamind.ui.theme.VitaMindTheme
+import com.dvc.vitamind.viewmodel.UserViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -56,17 +53,17 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
-    private val apiKey = "jAhGvWsJX5jxgAWiwhgeyJNHqAflkuQ1n3ji9lp2"
+     val apiKey = "jAhGvWsJX5jxgAWiwhgeyJNHqAflkuQ1n3ji9lp2"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             VitaMindTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    FoodSearchNavigation(apiKey)
+                    MainScreenWithBottomBar(apiKey)
 
 
                 }
@@ -74,6 +71,54 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    BottomNavigation(
+        modifier = Modifier.background(Color.Transparent),
+    ) {
+        BottomNavigationItem(
+            selected = currentDestination == "user_input",
+            onClick = { navController.navigate("user_input") },
+            icon = {
+                Icon(Icons.Default.Person, contentDescription = "Kullanıcı Girişi")
+            },
+            label = { Text("Giriş") }
+        )
+        BottomNavigationItem(
+            selected = currentDestination == "user_detail",
+            onClick = { navController.navigate("user_detail") },
+            icon = {
+                Icon(Icons.Default.Info, contentDescription = "Kullanıcı Detayları")
+            },
+            label = { Text("Detaylar") }
+        )
+        BottomNavigationItem(
+            selected = currentDestination == "search",
+            onClick = { navController.navigate("search") },
+            icon = {
+                Icon(Icons.Default.Search, contentDescription = "Gıda Arama")
+            },
+            label = { Text("Ara") }
+        )
+        /*
+        BottomNavigationItem(
+            selected = currentDestination == "details",
+            onClick = { navController.navigate("details") },
+            icon = {
+                Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Detaylar")
+            },
+            label = { Text("Besin Detayı") }
+        )
+
+         */
+    }
+}
+
 
 
 
@@ -111,39 +156,52 @@ fun fetchFoodData(apiKey: String, foodName: String, onResult: (List<Food>) -> Un
 }
 
 @Composable
-fun FoodSearchNavigation(apiKey: String) {
+fun MainScreenWithBottomBar(apiKey: String) {
     val navController = rememberNavController()
-    val viewModel: FoodSearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val viewModel: FoodSearchViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = "search") {
-        composable("search") {
-            FoodSearchApp(apiKey) { selectedFood ->
-                viewModel.selectFood(selectedFood) // Seçilen besini kaydet
-                navController.navigate("details")
-            }
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = navController)
         }
-        composable("details") {
-            val selectedFood = viewModel.selectedFood.value
-            if (selectedFood != null) {
-                FoodDetailScreen(selectedFood) {
-                    navController.popBackStack()
+    ) { innerPadding -> // innerPadding burada alınır
+        NavHost(
+            navController = navController,
+            startDestination = "user_input",
+            modifier = Modifier.padding(innerPadding) // innerPadding burada uygulanır
+        ) {
+            composable("user_input") {
+                UserInputScreen(navController)
+            }
+            composable("user_detail") {
+                UserDetailScreen()
+            }
+            composable("search") {
+                FoodSearchApp(apiKey) { selectedFood ->
+                    viewModel.selectFood(selectedFood)
+                    navController.navigate("details")
                 }
-            } else {
-                // Hata durumu, eğer veri eksikse
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Besin detayı bulunamadı.", style = MaterialTheme.typography.bodyLarge)
+            }
+            composable("details") {
+                val selectedFood = viewModel.selectedFood.value
+                if (selectedFood != null) {
+                    FoodDetailScreen(selectedFood) {
+                        navController.popBackStack()
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Besin detayı bulunamadı.", style = MaterialTheme.typography.bodyLarge)
+                    }
                 }
             }
         }
     }
+
+
 }
-
-
-
-
 
 
 @Preview(showBackground = true)

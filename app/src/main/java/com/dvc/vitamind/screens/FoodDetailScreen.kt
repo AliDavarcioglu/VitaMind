@@ -1,18 +1,46 @@
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.room.Room
 import com.dvc.vitamind.Food
+import com.dvc.vitamind.model.FoodNutrient
+import com.dvc.vitamind.roomdb.FoodDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodDetailScreen(food: Food, onBack: () -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var selectedNutrient by remember { mutableStateOf<FoodNutrient?>(null) }
+
+    val db = remember { Room.databaseBuilder(context, FoodDatabase::class.java, "food_database").build() }
+    val foodNutrientDao = db.foodNutrientDao()
     Scaffold(
+
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showDialog = true } // Butona tıklandığında dialog açılacak
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Nutrient") // Artı simgesi
+            }
+        }
 
     ) { innerPadding ->
         LazyColumn(
@@ -39,11 +67,6 @@ fun FoodDetailScreen(food: Food, onBack: () -> Unit) {
                 }
             }
 
-/*
-            val sortedNutrients = food.foodNutrients.filter { true }
-                .sortedByDescending { it.value }
-
- */
 
             val grams = food.foodNutrients.filter { it.unitName.equals("g", ignoreCase = true) }
                 .sortedByDescending { it.value }
@@ -59,7 +82,6 @@ fun FoodDetailScreen(food: Food, onBack: () -> Unit) {
 
             val sortedNutrients = calori + grams + milligrams + others
 
-            // Besin Değerlerini Listeleme
             items(sortedNutrients) { nutrient ->
                 NutrientCard(
                     nutrientName = nutrient.nutrientName,
@@ -68,6 +90,34 @@ fun FoodDetailScreen(food: Food, onBack: () -> Unit) {
                 )
             }
         }
+
+        if (showDialog) {
+            GramDialog(
+                onDismiss = { showDialog = false },
+                onAdd = { gramValue ->
+                    // Handle the nutrient data and insert into the database
+                    val newNutrient = FoodNutrient(
+                        nutrientName = food.description, // You may need to customize the nutrient name as needed
+                        value = gramValue.toDouble(),  // Or any default value
+                        unit = "g",// Assuming foodId is the primary key
+                        gram = gramValue
+                    )
+
+                    // Insert the new nutrient into the database
+                    CoroutineScope(Dispatchers.IO).launch {
+                        foodNutrientDao.insertNutrient(newNutrient)
+                    }
+
+                    // Close the dialog after adding
+                    showDialog = false
+                }
+            )
+        }
+
+
+
+
+
     }
 }
 
@@ -107,3 +157,45 @@ fun NutrientCard(nutrientName: String, value: Double, unit: String?) {
         }
     }
 }
+
+@Composable
+fun GramDialog(
+    onDismiss: () -> Unit,
+    onAdd: (Double) -> Unit,
+) {
+    var gramaj by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Gramaj Giriniz") },
+        text = {
+            Column {
+                TextField(
+                    value = gramaj,
+                    onValueChange = { gramaj = it },
+                    label = { Text("Gramaj (g)") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val gramajValue = gramaj.toDoubleOrNull() ?: 0.0
+                    onAdd(gramajValue)
+                    onDismiss()
+                }
+            ) {
+                Text("Ekle")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("İptal")
+            }
+        }
+    )
+}
+

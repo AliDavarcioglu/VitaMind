@@ -60,14 +60,10 @@ fun FoodSearchApp(apiKey: String, onFoodSelected: (Food) -> Unit) {
                 value = foodName,
                 onValueChange = { foodName = it },
                 label = { Text("Gıda Adı Girin") },
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(2.dp, MaterialTheme.shapes.medium),
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    .shadow(2.dp, MaterialTheme.shapes.medium)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
