@@ -1,5 +1,6 @@
 package com.dvc.vitamind.screens
 
+
 import com.dvc.vitamind.Keys
 import okhttp3.Call
 import okhttp3.Callback
@@ -16,15 +17,14 @@ import java.io.IOException
 fun analyzeFood(
     prompt: String,
     foodName: String,
-    weight: Int,
+    user: String,
     onResult: (String?) -> Unit
 ) {
 
       val apiKey = Keys.API_KEY
       val baseUrl = Keys.BASE_URL
 
-    // Gönderilecek metni oluştur
-    val textToAnalyze = "$prompt\nBesin adı: $foodName\nGramaj: $weight"
+    val textToAnalyze = "$prompt\nBesin adı: $foodName\nKullanıcı: $user"
 
 
     val jsonObject = JSONObject().apply {
@@ -43,21 +43,18 @@ fun analyzeFood(
         put("contents", contentsArray)
     }
 
-    // JSON gövdeyi RequestBody’e çevir
     val requestBody = jsonObject
         .toString()
         .toRequestBody("application/json".toMediaType())
 
     val client = OkHttpClient()
 
-    // HTTP isteğini oluştur
     val request = Request.Builder()
         .url(baseUrl)
         .post(requestBody)
         .addHeader("Content-Type", "application/json")
         .build()
 
-    // Asenkron olarak API çağrısı yap
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {
             onResult("Hata oluştu: ${e.message}")
@@ -89,7 +86,6 @@ fun analyzeFood(
                         onResult("Yanıtta 'candidates' bulunamadı.")
                     }
 
-                    //onResult(responseData)
                 } else {
                     onResult("Gelen yanıt boş")
                 }

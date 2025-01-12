@@ -26,8 +26,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.dvc.vitamind.model.User
 import com.dvc.vitamind.viewmodel.UserViewModel
 
@@ -140,9 +138,10 @@ fun UserInputScreen(navController: NavController) {
                 navController.navigate("user_detail")
 
             },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            Text("Save User")
+            Text("Save User",style = MaterialTheme.typography.bodyLarge)
         }
 
 

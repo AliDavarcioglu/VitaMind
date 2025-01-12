@@ -36,9 +36,9 @@ fun FoodDetailScreen(food: Food, onBack: () -> Unit) {
 
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showDialog = true } // Butona tıklandığında dialog açılacak
+                onClick = { showDialog = true }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Nutrient") // Artı simgesi
+                Icon(Icons.Default.Add, contentDescription = "Add Nutrient")
             }
         }
 
@@ -49,7 +49,6 @@ fun FoodDetailScreen(food: Food, onBack: () -> Unit) {
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            // Başlık ve Genel Bilgi
             item {
                 Column(
                     modifier = Modifier
@@ -95,20 +94,18 @@ fun FoodDetailScreen(food: Food, onBack: () -> Unit) {
             GramDialog(
                 onDismiss = { showDialog = false },
                 onAdd = { gramValue ->
-                    // Handle the nutrient data and insert into the database
                     val newNutrient = FoodNutrient(
-                        nutrientName = food.description, // You may need to customize the nutrient name as needed
-                        value = gramValue.toDouble(),  // Or any default value
-                        unit = "g",// Assuming foodId is the primary key
+                        nutrientName = food.description,
+                        value = gramValue.toDouble(),
+                        unit = "g",
                         gram = gramValue
                     )
 
-                    // Insert the new nutrient into the database
+
                     CoroutineScope(Dispatchers.IO).launch {
                         foodNutrientDao.insertNutrient(newNutrient)
                     }
 
-                    // Close the dialog after adding
                     showDialog = false
                 }
             )

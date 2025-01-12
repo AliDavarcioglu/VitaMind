@@ -55,7 +55,6 @@ fun FoodSearchApp(apiKey: String, onFoodSelected: (Food) -> Unit) {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // TextField for food name input
             TextField(
                 value = foodName,
                 onValueChange = { foodName = it },
@@ -68,7 +67,6 @@ fun FoodSearchApp(apiKey: String, onFoodSelected: (Food) -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Result or Loading Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -105,7 +103,7 @@ fun FoodSearchApp(apiKey: String, onFoodSelected: (Food) -> Unit) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Button at the bottom
+
             Button(
                 onClick = {
                     isLoading = true
@@ -116,9 +114,6 @@ fun FoodSearchApp(apiKey: String, onFoodSelected: (Food) -> Unit) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                shape = MaterialTheme.shapes.medium,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
             ) {
                 Text("Ara", style = MaterialTheme.typography.bodyLarge)
             }
@@ -144,7 +139,7 @@ fun FoodItem(food: Food, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Placeholder for an image or icon
+
             Box(
                 modifier = Modifier
                     .size(50.dp)
@@ -162,7 +157,7 @@ fun FoodItem(food: Food, onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                // Besin Adı
+
                 Text(
                     text = food.description,
                     style = MaterialTheme.typography.titleMedium,
@@ -173,9 +168,9 @@ fun FoodItem(food: Food, onClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Besin Özeti (örneğin türü veya küçük açıklama)
+
                 Text(
-                    text = "Kategorisi: ${food.description ?: "Bilinmiyor"}", // Eğer kategori varsa göster
+                    text = "Kategorisi: ${food.description ?: "Bilinmiyor"}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,

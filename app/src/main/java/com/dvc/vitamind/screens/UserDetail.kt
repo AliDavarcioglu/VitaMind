@@ -21,10 +21,11 @@ import com.dvc.vitamind.viewmodel.UserViewModel
 
 @Composable
 fun UserDetailScreen() {
+
     val foodNutrientViewModel: FoodNutrientViewModel = viewModel()
 
 
-    // Fetch food nutrients
+
     val nutrients = foodNutrientViewModel.allNutrients.observeAsState(emptyList())
 
     Column(
@@ -35,7 +36,7 @@ fun UserDetailScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Nutrients Section Header
+
         Text(
             text = "Food Nutrients",
             style = MaterialTheme.typography.headlineMedium,
@@ -43,7 +44,7 @@ fun UserDetailScreen() {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // List of Nutrients
+
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(nutrients.value) { nutrient ->
                 FoodNutrientItem(nutrient)
@@ -74,11 +75,11 @@ fun DetailRow(label: String, value: String) {
 @Composable
 fun FoodDetailScreen() {
     val foodNutrientViewModel: FoodNutrientViewModel = viewModel()
-    // Fetch food nutrients
+
     val nutrients = foodNutrientViewModel.allNutrients.observeAsState(emptyList())
 
     if (nutrients.value.isEmpty()) {
-        // Show empty state message
+
         Text(
             text = "No food nutrients found in the database.",
             style = MaterialTheme.typography.bodyLarge,
