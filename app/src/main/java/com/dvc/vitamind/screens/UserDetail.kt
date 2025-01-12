@@ -5,101 +5,45 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dvc.vitamind.model.FoodNutrient
 import com.dvc.vitamind.viewmodel.FoodNutrientViewModel
 import com.dvc.vitamind.viewmodel.UserViewModel
 
-
 @Composable
 fun UserDetailScreen() {
-    val userViewModel: UserViewModel = viewModel()
     val foodNutrientViewModel: FoodNutrientViewModel = viewModel()
 
-    // Kullanıcı verilerini al
-    LaunchedEffect(Unit) {
-        userViewModel.getLastUser()
-    }
 
-    val selectedUser = userViewModel.selectedUser.value
-
-    // Besin verilerini al
+    // Fetch food nutrients
     val nutrients = foodNutrientViewModel.allNutrients.observeAsState(emptyList())
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
 
-        selectedUser?.let { user ->
-            // Header Section - User Details
-            Text(
-                text = "User Details",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            // User Details Card
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Name
-                    DetailRow(label = "Name", value = user.name.toString())
-
-                    // Age
-                    DetailRow(label = "Age", value = user.age.toString())
-
-                    // Gender
-                    DetailRow(label = "Gender", value = user.gender.toString())
-
-                    // Weight
-                    DetailRow(label = "Weight", value = "${user.weight} kg")
-
-                    // Height
-                    DetailRow(label = "Height", value = "${user.height} cm")
-
-                    // Activity Level
-                    DetailRow(label = "Activity Level", value = user.activityLevel.toString())
-
-                    // Health Conditions
-                    DetailRow(
-                        label = "Health Conditions",
-                        value = user.healthConditions.toString()
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Besin öğelerini gösteren LazyColumn
+        // Nutrients Section Header
         Text(
             text = "Food Nutrients",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
+        // List of Nutrients
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(nutrients.value) { nutrient ->
                 FoodNutrientItem(nutrient)
@@ -116,30 +60,32 @@ fun DetailRow(label: String, value: String) {
     ) {
         Text(
             text = "$label:",
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
-
-
-
 @Composable
-fun FoodDeatilScreen() {
+fun FoodDetailScreen() {
     val foodNutrientViewModel: FoodNutrientViewModel = viewModel()
-    // Besin öğelerini al
+    // Fetch food nutrients
     val nutrients = foodNutrientViewModel.allNutrients.observeAsState(emptyList())
 
-    // Veritabanından çekilen veriyi göster
     if (nutrients.value.isEmpty()) {
-        // Veritabanında hiç veri yoksa bunu göster
-        Text(text = "No food nutrients found in the database.")
+        // Show empty state message
+        Text(
+            text = "No food nutrients found in the database.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.error
+        )
     } else {
-        // Veritabanında veriler varsa listeyi göster
+        // List of food nutrients
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(nutrients.value) { nutrient ->
                 FoodNutrientItem(nutrient)
@@ -155,19 +101,21 @@ fun FoodNutrientItem(nutrient: FoodNutrient) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable { /* Handle click if needed */ },
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Nutrient: ${nutrient.nutrientName}",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Value: ${nutrient.value} ${nutrient.unit}",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
         }
     }
 }
-

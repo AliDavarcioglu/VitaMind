@@ -175,7 +175,7 @@ fun FoodItem(food: Food, onClick: () -> Unit) {
 
                 // Besin Özeti (örneğin türü veya küçük açıklama)
                 Text(
-                    text = "Kategorisi: ${food.foodNutrients ?: "Bilinmiyor"}", // Eğer kategori varsa göster
+                    text = "Kategorisi: ${food.description ?: "Bilinmiyor"}", // Eğer kategori varsa göster
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,

@@ -40,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.dvc.vitamind.screens.AnalysisScreen
 import com.dvc.vitamind.screens.UserDetailScreen
 import com.dvc.vitamind.screens.UserInputScreen
 import com.dvc.vitamind.ui.theme.VitaMindTheme
@@ -73,13 +74,13 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
     BottomNavigation(
-        modifier = Modifier.background(Color.Transparent),
+        modifier = Modifier.background(Color.White),
+        elevation = 0.dp
     ) {
         BottomNavigationItem(
             selected = currentDestination == "user_input",
@@ -104,6 +105,14 @@ fun BottomNavigationBar(navController: NavController) {
                 Icon(Icons.Default.Search, contentDescription = "Gıda Arama")
             },
             label = { Text("Ara") }
+        )
+        BottomNavigationItem(
+            selected = currentDestination == "analysis",
+            onClick = { navController.navigate("analysis") },
+            icon = {
+                Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Analiz")
+            },
+            label = { Text("Analiz") }
         )
         /*
         BottomNavigationItem(
@@ -143,7 +152,7 @@ fun fetchFoodData(apiKey: String, foodName: String, onResult: (List<Food>) -> Un
 
                 val foods = response.body()?.foods ?: emptyList()
 
-                onResult(foods.take(10))
+                onResult(foods)
             } else {
                 onResult(emptyList())
             }
@@ -168,7 +177,7 @@ fun MainScreenWithBottomBar(apiKey: String) {
         NavHost(
             navController = navController,
             startDestination = "user_input",
-            modifier = Modifier.padding(innerPadding) // innerPadding burada uygulanır
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable("user_input") {
                 UserInputScreen(navController)
@@ -181,6 +190,9 @@ fun MainScreenWithBottomBar(apiKey: String) {
                     viewModel.selectFood(selectedFood)
                     navController.navigate("details")
                 }
+            }
+            composable("analysis") {
+                AnalysisScreen()
             }
             composable("details") {
                 val selectedFood = viewModel.selectedFood.value

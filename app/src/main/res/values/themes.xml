@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.VitaMind" parent="android:Theme.Material.Light.NoActionBar" />
+    <color name="colorPrimary">#FFFFFF</color>
+
+    <!-- Dark variant for status bar and navigation bar -->
+    <color name="colorPrimaryDark">#D1D1D1</color> <!-- Darker shade of white -->
+
+
+
+    <style name="Theme.VitaMind" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+
+    </style>
+
 </resources>

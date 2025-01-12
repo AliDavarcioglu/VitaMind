@@ -48,13 +48,14 @@ fun UserInputScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp), // Elemanlar arasına eşit boşluk koyar
+        verticalArrangement = Arrangement.spacedBy(8.dp), // Elemanlar arasına eşit boşluk koyar
         horizontalAlignment = Alignment.CenterHorizontally // Elemanları ortalar
     ) {
         Text(
             text = "Kullanıcı Bilgileri",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
         OutlinedTextField(
